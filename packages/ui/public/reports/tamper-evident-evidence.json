@@ -1,0 +1,258 @@
+{
+  "report_title": "TAMPER-EVIDENT EVIDENCE REPORT",
+  "report_type": "TAMPER-EVIDENT",
+  "generated_at": "2024-01-15T00:00:00Z",
+  "change_request": {
+    "field_name": "CUSTOMER-ID",
+    "target_type": "PIC X(12)",
+    "old_length": 8,
+    "new_length": 12,
+    "description": "Expand CUSTOMER-ID from PIC X(8) to PIC X(12)"
+  },
+  "impacted_artifacts": [
+    {
+      "id": "7f1285a5accb3eb9",
+      "path": "datasets/CUST.MASTER.FILE.dsd",
+      "type": "DATASET",
+      "reason": "SCHEMA_DEPENDENCY",
+      "details": "Dataset schema contains CUSTOMER-ID"
+    },
+    {
+      "id": "819c79ed37e885b3",
+      "path": "copybooks/CUSTMAST.CPY",
+      "type": "COPYBOOK",
+      "reason": "DIRECT_FIELD_REFERENCE",
+      "details": "Artifact directly declares or references CUSTOMER-ID"
+    },
+    {
+      "id": "310e5d6308a474c1",
+      "path": "datasets/CUST.REPORT.FILE.dsd",
+      "type": "DATASET",
+      "reason": "DATA_LINEAGE",
+      "details": "Downstream consumer of ZENITH.CUST.REPORT.FILE which carries CUSTOMER-ID"
+    },
+    {
+      "id": "86631093d5f48144",
+      "path": "cobol/CUSTPROG.CBL",
+      "type": "COBOL",
+      "reason": "DIRECT_FIELD_REFERENCE",
+      "details": "Artifact directly declares or references CUSTOMER-ID"
+    },
+    {
+      "id": "be52147dba43d85f",
+      "path": "copybooks/ACCTMAST.CPY",
+      "type": "COPYBOOK",
+      "reason": "COPYBOOK_CHAIN",
+      "details": "Copies copybooks/CUSTMAST.CPY which contains CUSTOMER-ID"
+    },
+    {
+      "id": "48055e92b3d29a31",
+      "path": "cobol/CUSTRPT.CBL",
+      "type": "COBOL",
+      "reason": "DIRECT_FIELD_REFERENCE",
+      "details": "Artifact directly declares or references CUSTOMER-ID"
+    },
+    {
+      "id": "712753fa8ff1213d",
+      "path": "cobol/ACCTPROG.CBL",
+      "type": "COBOL",
+      "reason": "DIRECT_FIELD_REFERENCE",
+      "details": "Artifact directly declares or references CUSTOMER-ID"
+    },
+    {
+      "id": "22c118bdeaf86148",
+      "path": "jcl/CUSTRPT.JCL",
+      "type": "JCL",
+      "reason": "DATA_LINEAGE",
+      "details": "Downstream consumer of ZENITH.CUST.MASTER.FILE which carries CUSTOMER-ID"
+    },
+    {
+      "id": "3525e4ac7c4334ce",
+      "path": "hlasm/CUSTDSCT.ASM",
+      "type": "HLASM",
+      "reason": "DIRECT_FIELD_REFERENCE",
+      "details": "HLASM artifact references CUSTOMER-ID (layout mirror)"
+    }
+  ],
+  "proposals": [
+    {
+      "id": "prop-custmast-12",
+      "artifact_id": "819c79ed37e885b3",
+      "description": "Expand CUSTOMER-ID PIC X(8) to PIC X(12)",
+      "confidence": 1.0,
+      "status": "VALIDATED",
+      "semantic_changes": [
+        {
+          "kind": "FIELD_RESIZE",
+          "line": 5,
+          "before": "05  CUSTOMER-ID             PIC X(8).",
+          "after": "05  CUSTOMER-ID             PIC X(12).",
+          "impact": "Expand CUSTOMER-ID from PIC X(8) to PIC X(12)"
+        }
+      ]
+    },
+    {
+      "id": "prop-custdsct-12",
+      "artifact_id": "3525e4ac7c4334ce",
+      "description": "Mirror CUSTOMER-ID expansion in HLASM DSECT (CL8 -> CL12)",
+      "confidence": 1.0,
+      "status": "VALIDATED",
+      "semantic_changes": [
+        {
+          "kind": "FIELD_RESIZE",
+          "line": 17,
+          "before": "CUSTID   DS    CL8",
+          "after": "CUSTID   DS    CL12",
+          "impact": "Expand CUSTID from CL8 to CL12"
+        },
+        {
+          "kind": "OFFSET_SHIFT",
+          "line": 31,
+          "before": "CUSTIDLN EQU   8",
+          "after": "CUSTIDLN EQU   12",
+          "impact": "Shift CUSTIDLN length symbol to 12"
+        }
+      ]
+    },
+    {
+      "id": "prop-dataset-schema-12",
+      "artifact_id": "7f1285a5accb3eb9",
+      "description": "Update dataset schema field lengths and LRECL for CUSTOMER-ID",
+      "confidence": 1.0,
+      "status": "VALIDATED",
+      "semantic_changes": [
+        {
+          "kind": "SCHEMA_UPDATE",
+          "line": 18,
+          "before": "\"length\": 8",
+          "after": "\"length\": 12",
+          "impact": "Expand CUSTOMER-ID length from 8 to 12"
+        },
+        {
+          "kind": "OFFSET_SHIFT",
+          "line": 27,
+          "before": "offset: 8+",
+          "after": "offset: 12+",
+          "impact": "Shift subsequent field offsets by +4"
+        },
+        {
+          "kind": "JCL_PARAM",
+          "line": 9,
+          "before": "\"lrecl\": 80",
+          "after": "\"lrecl\": 84",
+          "impact": "Update dataset LRECL from 80 to 84"
+        }
+      ]
+    },
+    {
+      "id": "prop-remediation-acctprog-12",
+      "artifact_id": "712753fa8ff1213d",
+      "description": "Remediate local WS-ACCT-CUST-ID to PIC X(12) to prevent truncation",
+      "confidence": 1.0,
+      "status": "VALIDATED",
+      "semantic_changes": [
+        {
+          "kind": "FIELD_RESIZE",
+          "line": 11,
+          "before": "01  WS-ACCT-CUST-ID             PIC X(8).",
+          "after": "01  WS-ACCT-CUST-ID             PIC X(12).",
+          "impact": "Remediate local variable WS-ACCT-CUST-ID to PIC X(12)"
+        }
+      ]
+    }
+  ],
+  "snapshot_ids": [
+    "snapshot-1-baseline",
+    "snapshot-2-proposed",
+    "snapshot-3-remediated"
+  ],
+  "scenarios": [
+    {
+      "status": "FAIL",
+      "scenario": "customer-id-expansion",
+      "finding": "DATA_TRUNCATION",
+      "source_length": 12,
+      "destination_length": 8,
+      "artifact": "cobol/ACCTPROG.CBL",
+      "evidence": "WS-ACCT-CUST-ID PIC X(8)"
+    },
+    {
+      "status": "PASS",
+      "scenario": "customer-id-expansion",
+      "finding": null,
+      "source_length": 12,
+      "destination_length": 12,
+      "artifact": "cobol/ACCTPROG.CBL",
+      "evidence": "WS-ACCT-CUST-ID PIC X(12)"
+    }
+  ],
+  "failures": [
+    {
+      "phase": "initial_validation",
+      "type": "RUNTIME_SCENARIO_FAILURE",
+      "details": {
+        "status": "FAIL",
+        "scenario": "customer-id-expansion",
+        "finding": "DATA_TRUNCATION",
+        "source_length": 12,
+        "destination_length": 8,
+        "artifact": "cobol/ACCTPROG.CBL",
+        "evidence": "WS-ACCT-CUST-ID PIC X(8)"
+      }
+    },
+    {
+      "phase": "adversarial_critic",
+      "type": "DATA_TRUNCATION",
+      "details": {
+        "severity": "CRITICAL",
+        "artifact": "cobol/ACCTPROG.CBL",
+        "finding_type": "DATA_TRUNCATION",
+        "evidence": "CUSTOMER-ID is 12 bytes but WS-ACCT-CUST-ID remains X(8)",
+        "remediation": "Change WS-ACCT-CUST-ID to X(12)"
+      }
+    }
+  ],
+  "adversarial_findings": [
+    {
+      "severity": "CRITICAL",
+      "artifact": "cobol/ACCTPROG.CBL",
+      "finding_type": "DATA_TRUNCATION",
+      "evidence": "CUSTOMER-ID is 12 bytes but WS-ACCT-CUST-ID remains X(8)",
+      "remediation": "Change WS-ACCT-CUST-ID to X(12)"
+    }
+  ],
+  "final_status": "PASS",
+  "deterministic_hashes": {
+    "workspace_baseline_sha256": "4cc4733119f97e09",
+    "snapshot-1-baseline_sha256": "bccfd391b082c57e",
+    "snapshot-2-proposed_sha256": "a224c524ae3ec7f2",
+    "snapshot-3-remediated_sha256": "e677aaba26d5c3f9",
+    "report_sha256": "6434d0befd6d87bbb065c5ea991c65bde9ca941534cbc548106161291b0fe43c"
+  },
+  "afp_impact": {
+    "artifact": "afp/CUSTRPT.AFP",
+    "document_name": "CUSTRPT-DOC",
+    "pages_count": 1,
+    "total_elements": 5,
+    "lineage_path": [
+      "CUSTOMER-ID",
+      "copybooks/CUSTMAST.CPY",
+      "cobol/CUSTRPT.CBL",
+      "datasets/CUST.REPORT.FILE.dsd",
+      "jcl/CUSTRPT.JCL",
+      "afp/CUSTRPT.AFP"
+    ],
+    "comparison": {
+      "artifact": "afp/CUSTRPT.AFP",
+      "upstream_field": "CUSTOMER-ID",
+      "before_capacity": 8,
+      "after_capacity": 12,
+      "source_schema_changed": true,
+      "afp_structure_changed": false,
+      "afp_layout_changed": false,
+      "explanation": "Upstream schema expands CUSTOMER-ID from 8 to 12 bytes. The static binary CUSTRPT.AFP maintains 8-byte capacity until the batch print generation job (CUSTRPT.JCL) is re-executed.",
+      "visualization_path": "reports/afp-custrpt.html"
+    },
+    "visualization_path": "reports/afp-custrpt.html"
+  }
+}

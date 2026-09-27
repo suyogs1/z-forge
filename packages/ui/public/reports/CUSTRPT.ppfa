@@ -1,0 +1,23 @@
+/* ============================================================ */
+/* Generated PPFA Source — semantic export                      */
+/* Z-FORGE IBM Z Print Engineering                              */
+/* Note: Semantic export; not compiled by IBM PPFA.            */
+/* ============================================================ */
+
+FORMDEF F1CUST
+    OFFSET 0.00 IN 0.00 IN
+    DUPLEX NO;
+
+PAGEDEF P1CUST
+    WIDTH 8.33 IN
+    HEIGHT 4.17 IN
+    DIRECTION DOWN
+    MARGINS 0.28 IN 0.28 IN 0.28 IN 0.28 IN;
+
+    SETUNITS LINESP 35 POINTS;
+    FONT FNT1 'C0S0PR10';
+
+    PRINTLINE CHANNEL 1 POSITION MARGIN 1.0 IN FONT FNT1;
+    PRINTLINE POSITION MARGIN NEXT FONT FNT1;
+
+/* PPFA END */
