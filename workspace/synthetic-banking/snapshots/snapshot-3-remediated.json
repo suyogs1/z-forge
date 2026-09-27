@@ -1,0 +1,25 @@
+{
+  "id": "snapshot-3-remediated",
+  "label": "Remediated proposal",
+  "timestamp": "2024-01-15T00:00:00Z",
+  "workspace_hash": "e677aaba26d5c3f9",
+  "proposals_applied": [
+    "prop-remediation-acctprog-12"
+  ],
+  "artifacts": {
+    "6e264f514eaf4f54": "41d12951742cc345",
+    "712753fa8ff1213d": "43dba46af47e5006",
+    "86631093d5f48144": "26d96712e904fcba",
+    "48055e92b3d29a31": "b65644ee38b44ba8",
+    "be52147dba43d85f": "b089baf1c74c3e3b",
+    "819c79ed37e885b3": "d82ff2994cb35845",
+    "15aadc7f3bb501d5": "f0510f18ecabf837",
+    "f190f08e8a29acb2": "3912ae4350280a78",
+    "7f1285a5accb3eb9": "339af3d8e84f03d0",
+    "310e5d6308a474c1": "04490e0fbf8ea4fd",
+    "3525e4ac7c4334ce": "49181702ea0a6463",
+    "88fdc7136d0e515f": "2c3f556c917c1fe7",
+    "22c118bdeaf86148": "2bd0fbd53daf621f",
+    "5cdc3e54e54cab95": "b8cae7afdbdec2b0"
+  }
+}

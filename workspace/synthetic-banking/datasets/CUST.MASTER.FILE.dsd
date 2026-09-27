@@ -1,0 +1,93 @@
+{
+  "_comment": "CUST.MASTER.FILE — Customer Master File dataset schema descriptor",
+  "_synthetic": true,
+  "_organization": "ZENITH BANK (fictional)",
+  "dataset_name": "ZENITH.CUST.MASTER.FILE",
+  "description": "Customer Master File — fixed-length sequential records",
+  "dcb": {
+    "recfm": "FB",
+    "lrecl": 80,
+    "blksize": 3200
+  },
+  "record_name": "CUSTOMER-MASTER-RECORD",
+  "copybook": "CUSTMAST.CPY",
+  "fields": [
+    {
+      "name": "CUSTOMER-ID",
+      "type": "X",
+      "length": 8,
+      "offset": 0,
+      "pic": "PIC X(8)",
+      "description": "Unique customer identifier — target of 8→12 expansion"
+    },
+    {
+      "name": "CUSTOMER-NAME",
+      "type": "X",
+      "length": 30,
+      "offset": 8,
+      "pic": "PIC X(30)",
+      "description": "Customer full name"
+    },
+    {
+      "name": "CUSTOMER-ADDRESS-1",
+      "type": "X",
+      "length": 30,
+      "offset": 38,
+      "pic": "PIC X(30)",
+      "description": "Street address line 1"
+    },
+    {
+      "name": "CUSTOMER-ADDRESS-2",
+      "type": "X",
+      "length": 20,
+      "offset": 68,
+      "pic": "PIC X(20)",
+      "description": "Address line 2"
+    },
+    {
+      "name": "CUSTOMER-CITY",
+      "type": "X",
+      "length": 15,
+      "offset": 88,
+      "pic": "PIC X(15)",
+      "description": "City"
+    },
+    {
+      "name": "CUSTOMER-STATE",
+      "type": "X",
+      "length": 2,
+      "offset": 103,
+      "pic": "PIC XX",
+      "description": "State code"
+    },
+    {
+      "name": "CUSTOMER-ZIP",
+      "type": "X",
+      "length": 10,
+      "offset": 105,
+      "pic": "PIC X(10)",
+      "description": "ZIP/postal code"
+    },
+    {
+      "name": "CUSTOMER-STATUS",
+      "type": "X",
+      "length": 1,
+      "offset": 115,
+      "pic": "PIC X",
+      "description": "A=Active, I=Inactive, S=Suspended"
+    },
+    {
+      "name": "CUSTOMER-OPEN-DATE",
+      "type": "X",
+      "length": 8,
+      "offset": 116,
+      "pic": "PIC X(8)",
+      "description": "Account open date YYYYMMDD"
+    }
+  ],
+  "notes": [
+    "lrecl=80 covers the first 80 bytes: CUSTOMER-ID(8)+CUSTOMER-NAME(30)+CUSTOMER-ADDRESS-1(30)+filler(12)",
+    "Fields at offset >= 80 are in the extended record area not stored in the 80-byte sample data file",
+    "After CUSTOMER-ID expands to PIC X(12), lrecl must be updated and all offset values shift by +4"
+  ]
+}

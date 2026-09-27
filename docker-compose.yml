@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: packages/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ZFORGE_WORKSPACE_ROOT=/workspace
+    volumes:
+      - ./workspace:/workspace:ro
+    profiles: ["full"]
+
+  mcp:
+    build:
+      context: packages/mcp
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - ZFORGE_API_URL=http://api:8000
+    depends_on:
+      - api
+    profiles: ["full"]
+
+  ui:
+    build:
+      context: packages/ui
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    profiles: ["full"]
+
+# Usage:
+#   docker compose --profile full up
+#
+# For local dev without Docker, run each service directly:
+#   packages/api:  uv run uvicorn app.main:app --reload
+#   packages/mcp:  uv run python server.py
+#   packages/ui:   npm run dev

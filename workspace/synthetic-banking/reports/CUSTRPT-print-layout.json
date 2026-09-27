@@ -1,0 +1,18 @@
+{
+  "page_definition": {
+    "width": 600,
+    "height": 300,
+    "orientation": "PORTRAIT",
+    "margin_top": 20,
+    "margin_bottom": 20,
+    "margin_left": 20,
+    "margin_right": 20,
+    "line_spacing": 35
+  },
+  "form_definition": {
+    "duplex": "SIMPLEX",
+    "offset_x": 0,
+    "offset_y": 0,
+    "overlay_enabled": true
+  }
+}

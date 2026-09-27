@@ -1,0 +1,107 @@
+﻿{
+    "version":  "1.0",
+    "workspace_id":  "synthetic-banking-v1",
+    "name":  "Synthetic Banking Workspace",
+    "description":  "Z-FORGE demo workspace — ZENITH BANK (fictional). Synthetic data only.",
+    "created_at":  "2024-01-15T00:00:00Z",
+    "scenario":  "CUSTOMER-ID PIC X(8) → PIC X(12) expansion",
+    "workspace_hash":  "dbfeedf774e5b4a1",
+    "artifacts":  [
+                      {
+                          "id":  "copybook-custmast",
+                          "path":  "copybooks/CUSTMAST.CPY",
+                          "type":  "COPYBOOK",
+                          "content_hash":  "8359de7fcb0218bb"
+                      },
+                      {
+                          "id":  "copybook-acctmast",
+                          "path":  "copybooks/ACCTMAST.CPY",
+                          "type":  "COPYBOOK",
+                          "content_hash":  "b089baf1c74c3e3b"
+                      },
+                      {
+                          "id":  "copybook-errcode",
+                          "path":  "copybooks/ERRCODE.CPY",
+                          "type":  "COPYBOOK",
+                          "content_hash":  "f0510f18ecabf837"
+                      },
+                      {
+                          "id":  "cobol-custprog",
+                          "path":  "cobol/CUSTPROG.CBL",
+                          "type":  "COBOL",
+                          "content_hash":  "26d96712e904fcba"
+                      },
+                      {
+                          "id":  "cobol-custrpt",
+                          "path":  "cobol/CUSTRPT.CBL",
+                          "type":  "COBOL",
+                          "content_hash":  "b65644ee38b44ba8"
+                      },
+                      {
+                          "id":  "cobol-acctprog",
+                          "path":  "cobol/ACCTPROG.CBL",
+                          "type":  "COBOL",
+                          "content_hash":  "a77018c6c2a04950"
+                      },
+                      {
+                          "id":  "hlasm-custdsct",
+                          "path":  "hlasm/CUSTDSCT.ASM",
+                          "type":  "HLASM",
+                          "content_hash":  "91c0b89994243bb8"
+                      },
+                      {
+                          "id":  "jcl-custload",
+                          "path":  "jcl/CUSTLOAD.JCL",
+                          "type":  "JCL",
+                          "content_hash":  "2c3f556c917c1fe7"
+                      },
+                      {
+                          "id":  "jcl-custrpt",
+                          "path":  "jcl/CUSTRPT.JCL",
+                          "type":  "JCL",
+                          "content_hash":  "2bd0fbd53daf621f"
+                      },
+                      {
+                          "id":  "jcl-nightly",
+                          "path":  "jcl/NIGHTLY.JCL",
+                          "type":  "JCL",
+                          "content_hash":  "b8cae7afdbdec2b0"
+                      },
+                      {
+                          "id":  "dataset-custmaster-dsd",
+                          "path":  "datasets/CUST.MASTER.FILE.dsd",
+                          "type":  "DATASET",
+                          "content_hash":  "d62bab561c13a796"
+                      },
+                      {
+                          "id":  "dataset-custrpt-dsd",
+                          "path":  "datasets/CUST.REPORT.FILE.dsd",
+                          "type":  "DATASET",
+                          "content_hash":  "04490e0fbf8ea4fd"
+                      },
+                      {
+                          "id":  "dataset-custmaster-dat",
+                          "path":  "datasets/CUST.MASTER.FILE.dat",
+                          "type":  "DATASET",
+                          "content_hash":  "3912ae4350280a78"
+                      },
+                      {
+                          "id":  "afp-custrpt",
+                          "path":  "afp/CUSTRPT.AFP",
+                          "type":  "AFP",
+                          "content_hash":  "41d12951742cc345"
+                      }
+                  ],
+    "snapshots":  [
+
+                  ],
+    "lineage_graph_path":  "graph/lineage.json",
+    "dependency_graph_path":  "graph/dependency.json",
+    "planted_failure":  {
+                            "artifact":  "cobol/ACCTPROG.CBL",
+                            "field":  "WS-ACCT-CUST-ID",
+                            "pic":  "PIC X(8)",
+                            "description":  "Local WORKING-STORAGE declaration not sourced from a copybook. After CUSTMAST expands CUSTOMER-ID to PIC X(12), MOVE CUSTOMER-ID TO WS-ACCT-CUST-ID truncates 4 bytes.",
+                            "detected_by":  "DeterministicScenarioAdapter + adversarial critic"
+                        }
+}

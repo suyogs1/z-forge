@@ -1,0 +1,38 @@
+[
+  {
+    "producer_id": "7f1285a5accb3eb9",
+    "consumer_id": "86631093d5f48144",
+    "dataset_name": "ZENITH.CUST.MASTER.FILE",
+    "dd_name": "CUSTMAST"
+  },
+  {
+    "producer_id": "7f1285a5accb3eb9",
+    "consumer_id": "22c118bdeaf86148",
+    "dataset_name": "ZENITH.CUST.MASTER.FILE",
+    "dd_name": "CUSTMAST"
+  },
+  {
+    "producer_id": "22c118bdeaf86148",
+    "consumer_id": "310e5d6308a474c1",
+    "dataset_name": "ZENITH.CUST.REPORT.FILE",
+    "dd_name": "CUSTRPT"
+  },
+  {
+    "producer_id": "7f1285a5accb3eb9",
+    "consumer_id": "86631093d5f48144",
+    "dataset_name": "ZENITH.CUST.MASTER.FILE",
+    "dd_name": "CUSTMAST"
+  },
+  {
+    "producer_id": "7f1285a5accb3eb9",
+    "consumer_id": "22c118bdeaf86148",
+    "dataset_name": "ZENITH.CUST.MASTER.FILE",
+    "dd_name": "CUSTMAST"
+  },
+  {
+    "producer_id": "22c118bdeaf86148",
+    "consumer_id": "310e5d6308a474c1",
+    "dataset_name": "ZENITH.CUST.REPORT.FILE",
+    "dd_name": "CUSTRPT"
+  }
+]

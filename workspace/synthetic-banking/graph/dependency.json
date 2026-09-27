@@ -1,0 +1,972 @@
+{
+  "artifacts": {
+    "6e264f514eaf4f54": {
+      "id": "6e264f514eaf4f54",
+      "path": "afp/CUSTRPT.AFP",
+      "type": "AFP",
+      "raw_content": "\u0000\u0011\u0000Ө�CUSTRPT-DOC\u0000\n\u0000Ө�PAGE001\u0000\u0006\u0000Ө�\u00002\u0000��CUSTOMER-ID: ZB000001  ZENITH BANK STATEMENT\u00004\u0000��NAME: ALDRIDGE SIMONE J                       \u0000\u0006\u0000ө�\u0000\u0006\u0000ө�\u0000\u0006\u0000ө�",
+      "metadata": {
+        "afp": true
+      }
+    },
+    "712753fa8ff1213d": {
+      "id": "712753fa8ff1213d",
+      "path": "cobol/ACCTPROG.CBL",
+      "type": "COBOL",
+      "raw_content": "      *================================================================\n      * ACCTPROG.CBL — Account Processing Program\n      * ZENITH BANK (fictional) — synthetic data only\n      *\n      * COPIES ACCTMAST (which in turn COPIES CUSTMAST).\n      * Dependency chain: CUSTMAST → ACCTMAST → ACCTPROG.\n      * CALLS CUSTPROG for customer validation.\n      *\n      * *** PLANTED FAILURE — DO NOT FIX UNTIL T6 ADVERSARIAL PASS ***\n      *\n      * WS-ACCT-CUST-ID is declared locally in WORKING-STORAGE as\n      * PIC X(8). It is NOT sourced from any copybook.\n      * After CUSTMAST.CPY is updated to CUSTOMER-ID PIC X(12),\n      * the MOVE CUSTOMER-ID TO WS-ACCT-CUST-ID will write 12 bytes\n      * into an 8-byte field — data truncation.\n      *\n      * The actor (LocalSyntaxAdapter) does NOT catch this because\n      * the syntax is valid. The adversarial critic and the\n      * DeterministicScenarioAdapter ARE required to surface this.\n      *================================================================\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. ACCTPROG.\n       AUTHOR. ZENITH-BANK-SYNTHETIC.\n       DATE-WRITTEN. 2024-01-01.\n\n       ENVIRONMENT DIVISION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT ACCOUNT-FILE ASSIGN TO ACCTMAST\n               ORGANIZATION IS SEQUENTIAL\n               ACCESS MODE IS SEQUENTIAL\n               FILE STATUS IS WS-FILE-STATUS.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  ACCOUNT-FILE\n           RECORDING MODE IS F\n           RECORD CONTAINS 80 CHARACTERS.\n           COPY ACCTMAST.\n\n       WORKING-STORAGE SECTION.\n           COPY ERRCODE.\n\n       01  WS-FILE-STATUS              PIC XX VALUE SPACES.\n           88  WS-FILE-OK              VALUE '00'.\n           88  WS-FILE-EOF             VALUE '10'.\n\n      *----------------------------------------------------------------\n      * PLANTED FAILURE: WS-ACCT-CUST-ID is PIC X(8) — local\n      * declaration, NOT sourced from CUSTMAST copybook.\n      * When CUSTOMER-ID expands to PIC X(12), this field stays at\n      * PIC X(8) unless explicitly updated.\n      * The MOVE statement below will silently truncate 4 bytes.\n      *----------------------------------------------------------------\n       01  WS-ACCT-CUST-ID             PIC X(8).\n       01  WS-ACCT-BALANCE-WORK        PIC S9(13)V99 COMP-3.\n       01  WS-PROCESS-COUNT            PIC 9(6) VALUE ZEROS.\n       01  WS-ERROR-COUNT              PIC 9(6) VALUE ZEROS.\n\n       PROCEDURE DIVISION.\n       0000-MAIN.\n           PERFORM 1000-OPEN-FILES\n           PERFORM 2000-PROCESS-ACCOUNTS\n               UNTIL WS-FILE-EOF\n           PERFORM 9000-CLOSE-FILES\n           STOP RUN.\n\n       1000-OPEN-FILES.\n           OPEN INPUT ACCOUNT-FILE\n           IF NOT WS-FILE-OK\n               MOVE ERR-IO-ERROR TO RETURN-CODE-WS\n               DISPLAY 'ACCTPROG: FILE OPEN ERROR ' WS-FILE-STATUS\n               STOP RUN\n           END-IF.\n\n       2000-PROCESS-ACCOUNTS.\n           READ ACCOUNT-FILE INTO ACCOUNT-MASTER-RECORD\n               AT END SET WS-FILE-EOF TO TRUE\n               NOT AT END\n                   PERFORM 2100-VALIDATE-ACCOUNT\n                   ADD 1 TO WS-PROCESS-COUNT\n           END-READ.\n\n       2100-VALIDATE-ACCOUNT.\n      *----------------------------------------------------------------\n      * PLANTED FAILURE: MOVE CUSTOMER-ID TO WS-ACCT-CUST-ID\n      * After expansion, CUSTOMER-ID is PIC X(12) but\n      * WS-ACCT-CUST-ID remains PIC X(8) → truncation of 4 bytes.\n      *----------------------------------------------------------------\n           MOVE CUSTOMER-ID TO WS-ACCT-CUST-ID\n           IF WS-ACCT-CUST-ID = SPACES\n               ADD 1 TO WS-ERROR-COUNT\n               DISPLAY 'ACCTPROG: BLANK CUSTOMER-ID IN ACCOUNT '\n                       ACCOUNT-NUMBER\n           END-IF\n           IF ACCT-ACTIVE\n               PERFORM 2200-PROCESS-ACTIVE-ACCOUNT\n           END-IF.\n\n       2200-PROCESS-ACTIVE-ACCOUNT.\n           CALL 'CUSTPROG' USING ACCOUNT-MASTER-RECORD\n               ON EXCEPTION\n                   ADD 1 TO WS-ERROR-COUNT\n                   DISPLAY 'ACCTPROG: CUSTPROG CALL FAILED FOR '\n                           WS-ACCT-CUST-ID\n           END-CALL.\n\n       9000-CLOSE-FILES.\n           CLOSE ACCOUNT-FILE\n           DISPLAY 'ACCTPROG: PROCESSED ' WS-PROCESS-COUNT\n                   ' ACCOUNTS, ' WS-ERROR-COUNT ' ERRORS'.\n",
+      "metadata": {
+        "program_id": "ACCTPROG",
+        "copy_statements": [
+          "ACCTMAST",
+          "ERRCODE"
+        ],
+        "call_statements": [
+          "CUSTPROG",
+          "FAILED"
+        ],
+        "local_declarations": [
+          {
+            "name": "WS-ACCT-CUST-ID",
+            "pic": "PIC X(8).",
+            "byte_size": 8,
+            "line": 55
+          },
+          {
+            "name": "WS-ACCT-BALANCE-WORK",
+            "pic": "PIC S9(13)V99 COMP-3",
+            "byte_size": 8,
+            "line": 56
+          },
+          {
+            "name": "WS-PROCESS-COUNT",
+            "pic": "PIC 9(6)",
+            "byte_size": 6,
+            "line": 57
+          },
+          {
+            "name": "WS-ERROR-COUNT",
+            "pic": "PIC 9(6)",
+            "byte_size": 6,
+            "line": 58
+          }
+        ],
+        "file_selects": [
+          {
+            "logical": "ACCOUNT-FILE",
+            "assign_to": "ACCTMAST"
+          }
+        ]
+      }
+    },
+    "86631093d5f48144": {
+      "id": "86631093d5f48144",
+      "path": "cobol/CUSTPROG.CBL",
+      "type": "COBOL",
+      "raw_content": "      *================================================================\n      * CUSTPROG.CBL — Customer Maintenance Program\n      * ZENITH BANK (fictional) — synthetic data only\n      *\n      * Reads and writes CUST.MASTER.FILE.\n      * COPIES CUSTMAST — dependency: CUSTMAST → CUSTPROG.\n      * Change scenario: when CUSTOMER-ID expands 8→12, this program's\n      *   WORKING-STORAGE (via copybook) and SELECT/FD must be updated.\n      *================================================================\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. CUSTPROG.\n       AUTHOR. ZENITH-BANK-SYNTHETIC.\n       DATE-WRITTEN. 2024-01-01.\n\n       ENVIRONMENT DIVISION.\n       CONFIGURATION SECTION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT CUSTOMER-FILE ASSIGN TO CUSTMAST\n               ORGANIZATION IS SEQUENTIAL\n               ACCESS MODE IS SEQUENTIAL\n               FILE STATUS IS WS-FILE-STATUS.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  CUSTOMER-FILE\n           RECORDING MODE IS F\n           BLOCK CONTAINS 0 RECORDS\n           RECORD CONTAINS 80 CHARACTERS.\n           COPY CUSTMAST.\n\n       WORKING-STORAGE SECTION.\n           COPY ERRCODE.\n\n       01  WS-FILE-STATUS              PIC XX VALUE SPACES.\n           88  WS-FILE-OK              VALUE '00'.\n           88  WS-FILE-EOF             VALUE '10'.\n\n       01  WS-OPERATION                PIC X VALUE SPACE.\n           88  WS-OP-READ              VALUE 'R'.\n           88  WS-OP-WRITE             VALUE 'W'.\n           88  WS-OP-UPDATE            VALUE 'U'.\n\n       01  WS-RECORD-COUNT             PIC 9(6) VALUE ZEROS.\n       01  WS-SEARCH-ID                PIC X(8) VALUE SPACES.\n\n       PROCEDURE DIVISION.\n       0000-MAIN.\n           PERFORM 1000-OPEN-FILES\n           PERFORM 2000-PROCESS-RECORDS\n               UNTIL WS-FILE-EOF\n           PERFORM 9000-CLOSE-FILES\n           STOP RUN.\n\n       1000-OPEN-FILES.\n           OPEN INPUT CUSTOMER-FILE\n           IF NOT WS-FILE-OK\n               MOVE ERR-IO-ERROR TO RETURN-CODE-WS\n               DISPLAY 'CUSTPROG: FILE OPEN ERROR ' WS-FILE-STATUS\n               STOP RUN\n           END-IF.\n\n       2000-PROCESS-RECORDS.\n           READ CUSTOMER-FILE INTO CUSTOMER-MASTER-RECORD\n               AT END SET WS-FILE-EOF TO TRUE\n               NOT AT END\n                   PERFORM 2100-VALIDATE-RECORD\n                   ADD 1 TO WS-RECORD-COUNT\n           END-READ.\n\n       2100-VALIDATE-RECORD.\n           IF CUSTOMER-ID = SPACES\n               MOVE ERR-INVALID-STATUS TO RETURN-CODE-WS\n               DISPLAY 'CUSTPROG: BLANK CUSTOMER-ID AT '\n                       WS-RECORD-COUNT\n           END-IF\n           IF NOT (CUST-ACTIVE OR CUST-INACTIVE OR CUST-SUSPENDED)\n               DISPLAY 'CUSTPROG: INVALID STATUS FOR ' CUSTOMER-ID\n           END-IF.\n\n       9000-CLOSE-FILES.\n           CLOSE CUSTOMER-FILE\n           DISPLAY 'CUSTPROG: PROCESSED ' WS-RECORD-COUNT ' RECORDS'.\n",
+      "metadata": {
+        "program_id": "CUSTPROG",
+        "copy_statements": [
+          "CUSTMAST",
+          "ERRCODE"
+        ],
+        "call_statements": [],
+        "local_declarations": [
+          {
+            "name": "WS-OPERATION",
+            "pic": "PIC X",
+            "byte_size": 1,
+            "line": 39
+          },
+          {
+            "name": "WS-RECORD-COUNT",
+            "pic": "PIC 9(6)",
+            "byte_size": 6,
+            "line": 44
+          },
+          {
+            "name": "WS-SEARCH-ID",
+            "pic": "PIC X(8)",
+            "byte_size": 8,
+            "line": 45
+          }
+        ],
+        "file_selects": [
+          {
+            "logical": "CUSTOMER-FILE",
+            "assign_to": "CUSTMAST"
+          }
+        ]
+      }
+    },
+    "48055e92b3d29a31": {
+      "id": "48055e92b3d29a31",
+      "path": "cobol/CUSTRPT.CBL",
+      "type": "COBOL",
+      "raw_content": "      *================================================================\n      * CUSTRPT.CBL — Customer Report Generator\n      * ZENITH BANK (fictional) — synthetic data only\n      *\n      * Reads CUST.MASTER.FILE, writes CUST.REPORT.FILE.\n      * COPIES CUSTMAST — dependency: CUSTMAST → CUSTRPT.\n      * MOVEs CUSTOMER-ID to output — offset-sensitive.\n      * Change scenario: when CUSTOMER-ID expands 8→12, the MOVE\n      *   statements and report layout must be updated.\n      * Data lineage: CUST.MASTER.FILE → CUSTRPT → CUST.REPORT.FILE\n      *   → AFP output (CUSTRPT.AFP)\n      *================================================================\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. CUSTRPT.\n       AUTHOR. ZENITH-BANK-SYNTHETIC.\n       DATE-WRITTEN. 2024-01-01.\n\n       ENVIRONMENT DIVISION.\n       INPUT-OUTPUT SECTION.\n       FILE-CONTROL.\n           SELECT CUSTOMER-FILE ASSIGN TO CUSTMAST\n               ORGANIZATION IS SEQUENTIAL\n               ACCESS MODE IS SEQUENTIAL\n               FILE STATUS IS WS-IN-STATUS.\n           SELECT REPORT-FILE ASSIGN TO CUSTRPT\n               ORGANIZATION IS SEQUENTIAL\n               ACCESS MODE IS SEQUENTIAL\n               FILE STATUS IS WS-OUT-STATUS.\n\n       DATA DIVISION.\n       FILE SECTION.\n       FD  CUSTOMER-FILE\n           RECORDING MODE IS F\n           RECORD CONTAINS 80 CHARACTERS.\n           COPY CUSTMAST.\n\n       FD  REPORT-FILE\n           RECORDING MODE IS F\n           RECORD CONTAINS 133 CHARACTERS.\n       01  REPORT-RECORD               PIC X(133).\n\n       WORKING-STORAGE SECTION.\n           COPY ERRCODE.\n\n       01  WS-IN-STATUS                PIC XX VALUE SPACES.\n           88  WS-IN-OK                VALUE '00'.\n           88  WS-IN-EOF               VALUE '10'.\n       01  WS-OUT-STATUS               PIC XX VALUE SPACES.\n           88  WS-OUT-OK               VALUE '00'.\n\n       01  WS-REPORT-LINE.\n           05  RPT-LINE-TYPE           PIC X.\n           05  RPT-CUSTOMER-ID         PIC X(8).\n           05  FILLER                  PIC X VALUE SPACE.\n           05  RPT-CUSTOMER-NAME       PIC X(30).\n           05  FILLER                  PIC X VALUE SPACE.\n           05  RPT-STATUS              PIC X.\n           05  FILLER                  PIC X VALUE SPACE.\n           05  RPT-OPEN-DATE           PIC X(8).\n           05  FILLER                  PIC X(82).\n\n       01  WS-RECORD-COUNT             PIC 9(6) VALUE ZEROS.\n       01  WS-ACTIVE-COUNT             PIC 9(6) VALUE ZEROS.\n\n       PROCEDURE DIVISION.\n       0000-MAIN.\n           PERFORM 1000-OPEN-FILES\n           PERFORM 2000-WRITE-HEADER\n           PERFORM 3000-PROCESS-RECORDS\n               UNTIL WS-IN-EOF\n           PERFORM 4000-WRITE-SUMMARY\n           PERFORM 9000-CLOSE-FILES\n           STOP RUN.\n\n       1000-OPEN-FILES.\n           OPEN INPUT CUSTOMER-FILE\n           OPEN OUTPUT REPORT-FILE\n           IF NOT WS-IN-OK\n               DISPLAY 'CUSTRPT: INPUT FILE OPEN ERROR'\n               STOP RUN\n           END-IF.\n\n       2000-WRITE-HEADER.\n           MOVE SPACES TO REPORT-RECORD\n           MOVE 'H' TO REPORT-RECORD(1:1)\n           MOVE 'ZENITH BANK - CUSTOMER MASTER REPORT' TO\n               REPORT-RECORD(3:36)\n           WRITE REPORT-RECORD.\n\n       3000-PROCESS-RECORDS.\n           READ CUSTOMER-FILE INTO CUSTOMER-MASTER-RECORD\n               AT END SET WS-IN-EOF TO TRUE\n               NOT AT END\n                   PERFORM 3100-WRITE-DETAIL-LINE\n                   ADD 1 TO WS-RECORD-COUNT\n                   IF CUST-ACTIVE\n                       ADD 1 TO WS-ACTIVE-COUNT\n                   END-IF\n           END-READ.\n\n       3100-WRITE-DETAIL-LINE.\n           MOVE 'D'           TO RPT-LINE-TYPE\n           MOVE CUSTOMER-ID   TO RPT-CUSTOMER-ID\n           MOVE CUSTOMER-NAME TO RPT-CUSTOMER-NAME\n           MOVE CUSTOMER-STATUS TO RPT-STATUS\n           MOVE CUSTOMER-OPEN-DATE TO RPT-OPEN-DATE\n           WRITE REPORT-RECORD FROM WS-REPORT-LINE.\n\n       4000-WRITE-SUMMARY.\n           MOVE SPACES TO REPORT-RECORD\n           MOVE 'T' TO REPORT-RECORD(1:1)\n           MOVE WS-RECORD-COUNT TO REPORT-RECORD(3:6)\n           MOVE WS-ACTIVE-COUNT TO REPORT-RECORD(10:6)\n           WRITE REPORT-RECORD.\n\n       9000-CLOSE-FILES.\n           CLOSE CUSTOMER-FILE\n           CLOSE REPORT-FILE\n           DISPLAY 'CUSTRPT: REPORT WRITTEN ' WS-RECORD-COUNT\n                   ' RECORDS, ' WS-ACTIVE-COUNT ' ACTIVE'.\n",
+      "metadata": {
+        "program_id": "CUSTRPT",
+        "copy_statements": [
+          "CUSTMAST",
+          "ERRCODE"
+        ],
+        "call_statements": [],
+        "local_declarations": [
+          {
+            "name": "WS-RECORD-COUNT",
+            "pic": "PIC 9(6)",
+            "byte_size": 6,
+            "line": 62
+          },
+          {
+            "name": "WS-ACTIVE-COUNT",
+            "pic": "PIC 9(6)",
+            "byte_size": 6,
+            "line": 63
+          }
+        ],
+        "file_selects": [
+          {
+            "logical": "CUSTOMER-FILE",
+            "assign_to": "CUSTMAST"
+          },
+          {
+            "logical": "REPORT-FILE",
+            "assign_to": "CUSTRPT"
+          }
+        ]
+      }
+    },
+    "be52147dba43d85f": {
+      "id": "be52147dba43d85f",
+      "path": "copybooks/ACCTMAST.CPY",
+      "type": "COPYBOOK",
+      "raw_content": "      *================================================================\n      * ACCTMAST.CPY — ACCOUNT-MASTER-RECORD copybook\n      * ZENITH BANK (fictional) — synthetic data only\n      *\n      * This copybook includes CUSTMAST, establishing a copybook chain:\n      *   CUSTMAST → ACCTMAST → ACCTPROG\n      * Any change to CUSTMAST.CPY propagates through this copybook.\n      *================================================================\n       01  ACCOUNT-MASTER-RECORD.\n           05  ACCOUNT-NUMBER          PIC X(10).\n           05  ACCOUNT-TYPE            PIC X.\n               88  ACCT-CHECKING       VALUE 'C'.\n               88  ACCT-SAVINGS        VALUE 'S'.\n               88  ACCT-LOAN           VALUE 'L'.\n           05  ACCOUNT-BALANCE         PIC S9(11)V99 COMP-3.\n           05  ACCOUNT-OPEN-DATE       PIC X(8).\n           05  ACCOUNT-LAST-TXN-DATE   PIC X(8).\n           05  ACCOUNT-STATUS          PIC X.\n               88  ACCT-ACTIVE         VALUE 'A'.\n               88  ACCT-CLOSED         VALUE 'C'.\n           05  ACCOUNT-OWNER-RECORD.\n               COPY CUSTMAST.\n",
+      "metadata": {
+        "fields": [
+          {
+            "name": "ACCOUNT-NUMBER",
+            "pic": "PIC X(10).",
+            "byte_size": 10,
+            "level": 5
+          },
+          {
+            "name": "ACCOUNT-TYPE",
+            "pic": "PIC X.",
+            "byte_size": 1,
+            "level": 5
+          },
+          {
+            "name": "ACCOUNT-BALANCE",
+            "pic": "PIC S9(11)V99 COMP-3",
+            "byte_size": 7,
+            "level": 5
+          },
+          {
+            "name": "ACCOUNT-OPEN-DATE",
+            "pic": "PIC X(8).",
+            "byte_size": 8,
+            "level": 5
+          },
+          {
+            "name": "ACCOUNT-LAST-TXN-DATE",
+            "pic": "PIC X(8).",
+            "byte_size": 8,
+            "level": 5
+          },
+          {
+            "name": "ACCOUNT-STATUS",
+            "pic": "PIC X.",
+            "byte_size": 1,
+            "level": 5
+          }
+        ],
+        "copy_statements": [
+          "CUSTMAST"
+        ]
+      }
+    },
+    "819c79ed37e885b3": {
+      "id": "819c79ed37e885b3",
+      "path": "copybooks/CUSTMAST.CPY",
+      "type": "COPYBOOK",
+      "raw_content": "      *================================================================\n      * CUSTMAST.CPY — CUSTOMER-MASTER-RECORD copybook\n      * ZENITH BANK (fictional) — synthetic data only\n      *\n      * IMPORTANT: CUSTOMER-ID PIC X(8) is the field targeted for\n      * expansion in the demo scenario (8 → 12 bytes).\n      * Blast-radius analysis starts here.\n      *================================================================\n       01  CUSTOMER-MASTER-RECORD.\n           05  CUSTOMER-ID             PIC X(8).\n           05  CUSTOMER-NAME           PIC X(30).\n           05  CUSTOMER-ADDRESS-1      PIC X(30).\n           05  CUSTOMER-ADDRESS-2      PIC X(20).\n           05  CUSTOMER-CITY           PIC X(15).\n           05  CUSTOMER-STATE          PIC XX.\n           05  CUSTOMER-ZIP            PIC X(10).\n           05  CUSTOMER-STATUS         PIC X.\n               88  CUST-ACTIVE         VALUE 'A'.\n               88  CUST-INACTIVE       VALUE 'I'.\n               88  CUST-SUSPENDED      VALUE 'S'.\n           05  CUSTOMER-OPEN-DATE      PIC X(8).\n           05  FILLER                  PIC X(36).\n      *  Total: 8+30+30+20+15+2+10+1+8+36 = 160 bytes (padded to 160)\n      *  Record length for CUST.MASTER.FILE is 80 bytes (first 80 used)\n",
+      "metadata": {
+        "fields": [
+          {
+            "name": "CUSTOMER-ID",
+            "pic": "PIC X(8).",
+            "byte_size": 8,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-NAME",
+            "pic": "PIC X(30).",
+            "byte_size": 30,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-ADDRESS-1",
+            "pic": "PIC X(30).",
+            "byte_size": 30,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-ADDRESS-2",
+            "pic": "PIC X(20).",
+            "byte_size": 20,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-CITY",
+            "pic": "PIC X(15).",
+            "byte_size": 15,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-STATE",
+            "pic": "PIC XX.",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-ZIP",
+            "pic": "PIC X(10).",
+            "byte_size": 10,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-STATUS",
+            "pic": "PIC X.",
+            "byte_size": 1,
+            "level": 5
+          },
+          {
+            "name": "CUSTOMER-OPEN-DATE",
+            "pic": "PIC X(8).",
+            "byte_size": 8,
+            "level": 5
+          },
+          {
+            "name": "FILLER",
+            "pic": "PIC X(36).",
+            "byte_size": 36,
+            "level": 5
+          }
+        ],
+        "copy_statements": []
+      }
+    },
+    "15aadc7f3bb501d5": {
+      "id": "15aadc7f3bb501d5",
+      "path": "copybooks/ERRCODE.CPY",
+      "type": "COPYBOOK",
+      "raw_content": "      *================================================================\n      * ERRCODE.CPY — error code constants\n      * ZENITH BANK (fictional) — synthetic data only\n      *================================================================\n       01  ERROR-CODES.\n           05  ERR-NONE                PIC S9(4) COMP VALUE +0.\n           05  ERR-RECORD-NOT-FOUND    PIC S9(4) COMP VALUE +4.\n           05  ERR-DUPLICATE-KEY       PIC S9(4) COMP VALUE +8.\n           05  ERR-IO-ERROR            PIC S9(4) COMP VALUE +12.\n           05  ERR-INVALID-STATUS      PIC S9(4) COMP VALUE +16.\n           05  ERR-FIELD-OVERFLOW      PIC S9(4) COMP VALUE +20.\n           05  ERR-PROGRAM-ABEND       PIC S9(4) COMP VALUE +99.\n\n       01  RETURN-CODE-WS              PIC S9(4) COMP VALUE +0.\n",
+      "metadata": {
+        "fields": [
+          {
+            "name": "ERR-NONE",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-RECORD-NOT-FOUND",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-DUPLICATE-KEY",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-IO-ERROR",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-INVALID-STATUS",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-FIELD-OVERFLOW",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "ERR-PROGRAM-ABEND",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 5
+          },
+          {
+            "name": "RETURN-CODE-WS",
+            "pic": "PIC S9(4) COMP",
+            "byte_size": 2,
+            "level": 1
+          }
+        ],
+        "copy_statements": []
+      }
+    },
+    "f190f08e8a29acb2": {
+      "id": "f190f08e8a29acb2",
+      "path": "datasets/CUST.MASTER.FILE.dat",
+      "type": "DATASET",
+      "raw_content": "ZB000001ALDRIDGE SIMONE J             742 LAKEVIEW DR NORTH         A20180315   \nZB000002NAKAMURA KENJI T              1804 WESTERN BLVD APT 9       A20191120   \nZB000003OKONKWO CHIDI F               55 PRAIRIE LANE               I20150601   \nZB000004PATEL PRIYA R                 900 SILICON HEIGHTS SUITE 200 A20210802   \nZB000005DELACROIX MARC A              22 RUE SYNTH?TIQUE            A20170410   \nZB000006WASHINGTON DANA L             38 FEDERAL PLAZA              S20130726   \nZB000007ERIKSSON BJORN G              14 NORDIC CIRCLE              A20220111   \nZB000008IBRAHIM FATIMA Z              77 CRESCENT WAY               A20200930   \nZB000009KOWALSKI TOMAS P              3 BRIDGE STREET EAST          I20160215   \nZB000010TANAKA YUKI M                 801 SAKURA AVENUE             A20231005   \n",
+      "metadata": {
+        "sample_record_count": 10,
+        "inferred_lrecl": 80
+      }
+    },
+    "7f1285a5accb3eb9": {
+      "id": "7f1285a5accb3eb9",
+      "path": "datasets/CUST.MASTER.FILE.dsd",
+      "type": "DATASET",
+      "raw_content": "{\n  \"_comment\": \"CUST.MASTER.FILE — Customer Master File dataset schema descriptor\",\n  \"_synthetic\": true,\n  \"_organization\": \"ZENITH BANK (fictional)\",\n  \"dataset_name\": \"ZENITH.CUST.MASTER.FILE\",\n  \"description\": \"Customer Master File — fixed-length sequential records\",\n  \"dcb\": {\n    \"recfm\": \"FB\",\n    \"lrecl\": 80,\n    \"blksize\": 3200\n  },\n  \"record_name\": \"CUSTOMER-MASTER-RECORD\",\n  \"copybook\": \"CUSTMAST.CPY\",\n  \"fields\": [\n    {\n      \"name\": \"CUSTOMER-ID\",\n      \"type\": \"X\",\n      \"length\": 8,\n      \"offset\": 0,\n      \"pic\": \"PIC X(8)\",\n      \"description\": \"Unique customer identifier — target of 8→12 expansion\"\n    },\n    {\n      \"name\": \"CUSTOMER-NAME\",\n      \"type\": \"X\",\n      \"length\": 30,\n      \"offset\": 8,\n      \"pic\": \"PIC X(30)\",\n      \"description\": \"Customer full name\"\n    },\n    {\n      \"name\": \"CUSTOMER-ADDRESS-1\",\n      \"type\": \"X\",\n      \"length\": 30,\n      \"offset\": 38,\n      \"pic\": \"PIC X(30)\",\n      \"description\": \"Street address line 1\"\n    },\n    {\n      \"name\": \"CUSTOMER-ADDRESS-2\",\n      \"type\": \"X\",\n      \"length\": 20,\n      \"offset\": 68,\n      \"pic\": \"PIC X(20)\",\n      \"description\": \"Address line 2\"\n    },\n    {\n      \"name\": \"CUSTOMER-CITY\",\n      \"type\": \"X\",\n      \"length\": 15,\n      \"offset\": 88,\n      \"pic\": \"PIC X(15)\",\n      \"description\": \"City\"\n    },\n    {\n      \"name\": \"CUSTOMER-STATE\",\n      \"type\": \"X\",\n      \"length\": 2,\n      \"offset\": 103,\n      \"pic\": \"PIC XX\",\n      \"description\": \"State code\"\n    },\n    {\n      \"name\": \"CUSTOMER-ZIP\",\n      \"type\": \"X\",\n      \"length\": 10,\n      \"offset\": 105,\n      \"pic\": \"PIC X(10)\",\n      \"description\": \"ZIP/postal code\"\n    },\n    {\n      \"name\": \"CUSTOMER-STATUS\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 115,\n      \"pic\": \"PIC X\",\n      \"description\": \"A=Active, I=Inactive, S=Suspended\"\n    },\n    {\n      \"name\": \"CUSTOMER-OPEN-DATE\",\n      \"type\": \"X\",\n      \"length\": 8,\n      \"offset\": 116,\n      \"pic\": \"PIC X(8)\",\n      \"description\": \"Account open date YYYYMMDD\"\n    }\n  ],\n  \"notes\": [\n    \"lrecl=80 covers the first 80 bytes: CUSTOMER-ID(8)+CUSTOMER-NAME(30)+CUSTOMER-ADDRESS-1(30)+filler(12)\",\n    \"Fields at offset >= 80 are in the extended record area not stored in the 80-byte sample data file\",\n    \"After CUSTOMER-ID expands to PIC X(12), lrecl must be updated and all offset values shift by +4\"\n  ]\n}\n",
+      "metadata": {
+        "dataset_name": "ZENITH.CUST.MASTER.FILE",
+        "lrecl": 80,
+        "copybook": "CUSTMAST.CPY",
+        "program": "",
+        "fields": [
+          {
+            "name": "CUSTOMER-ID",
+            "offset": 0,
+            "length": 8,
+            "pic": "PIC X(8)"
+          },
+          {
+            "name": "CUSTOMER-NAME",
+            "offset": 8,
+            "length": 30,
+            "pic": "PIC X(30)"
+          },
+          {
+            "name": "CUSTOMER-ADDRESS-1",
+            "offset": 38,
+            "length": 30,
+            "pic": "PIC X(30)"
+          },
+          {
+            "name": "CUSTOMER-ADDRESS-2",
+            "offset": 68,
+            "length": 20,
+            "pic": "PIC X(20)"
+          },
+          {
+            "name": "CUSTOMER-CITY",
+            "offset": 88,
+            "length": 15,
+            "pic": "PIC X(15)"
+          },
+          {
+            "name": "CUSTOMER-STATE",
+            "offset": 103,
+            "length": 2,
+            "pic": "PIC XX"
+          },
+          {
+            "name": "CUSTOMER-ZIP",
+            "offset": 105,
+            "length": 10,
+            "pic": "PIC X(10)"
+          },
+          {
+            "name": "CUSTOMER-STATUS",
+            "offset": 115,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "CUSTOMER-OPEN-DATE",
+            "offset": 116,
+            "length": 8,
+            "pic": "PIC X(8)"
+          }
+        ]
+      }
+    },
+    "310e5d6308a474c1": {
+      "id": "310e5d6308a474c1",
+      "path": "datasets/CUST.REPORT.FILE.dsd",
+      "type": "DATASET",
+      "raw_content": "{\n  \"_comment\": \"CUST.REPORT.FILE — Customer Report File dataset schema descriptor\",\n  \"_synthetic\": true,\n  \"_organization\": \"ZENITH BANK (fictional)\",\n  \"dataset_name\": \"ZENITH.CUST.REPORT.FILE\",\n  \"description\": \"Customer Report File — generated by CUSTRPT program\",\n  \"dcb\": {\n    \"recfm\": \"FBA\",\n    \"lrecl\": 133,\n    \"blksize\": 5320\n  },\n  \"record_name\": \"REPORT-RECORD\",\n  \"program\": \"CUSTRPT.CBL\",\n  \"fields\": [\n    {\n      \"name\": \"RPT-LINE-TYPE\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 0,\n      \"pic\": \"PIC X\",\n      \"description\": \"H=Header, D=Detail, T=Trailer\"\n    },\n    {\n      \"name\": \"RPT-CUSTOMER-ID\",\n      \"type\": \"X\",\n      \"length\": 8,\n      \"offset\": 1,\n      \"pic\": \"PIC X(8)\",\n      \"description\": \"Customer ID copied from CUST.MASTER.FILE — must match CUSTOMER-ID length\",\n      \"source_field\": \"CUSTOMER-ID\"\n    },\n    {\n      \"name\": \"RPT-FILLER-1\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 9,\n      \"pic\": \"PIC X\",\n      \"description\": \"Space separator\"\n    },\n    {\n      \"name\": \"RPT-CUSTOMER-NAME\",\n      \"type\": \"X\",\n      \"length\": 30,\n      \"offset\": 10,\n      \"pic\": \"PIC X(30)\",\n      \"description\": \"Customer name\"\n    },\n    {\n      \"name\": \"RPT-FILLER-2\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 40,\n      \"pic\": \"PIC X\",\n      \"description\": \"Space separator\"\n    },\n    {\n      \"name\": \"RPT-STATUS\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 41,\n      \"pic\": \"PIC X\",\n      \"description\": \"Customer status\"\n    },\n    {\n      \"name\": \"RPT-FILLER-3\",\n      \"type\": \"X\",\n      \"length\": 1,\n      \"offset\": 42,\n      \"pic\": \"PIC X\",\n      \"description\": \"Space separator\"\n    },\n    {\n      \"name\": \"RPT-OPEN-DATE\",\n      \"type\": \"X\",\n      \"length\": 8,\n      \"offset\": 43,\n      \"pic\": \"PIC X(8)\",\n      \"description\": \"Account open date\"\n    },\n    {\n      \"name\": \"RPT-FILLER\",\n      \"type\": \"X\",\n      \"length\": 82,\n      \"offset\": 51,\n      \"pic\": \"PIC X(82)\",\n      \"description\": \"Remaining report line area\"\n    }\n  ],\n  \"notes\": [\n    \"RPT-CUSTOMER-ID (length 8, offset 1) must be kept in sync with CUSTOMER-ID in CUSTMAST.CPY\",\n    \"After CUSTOMER-ID expands to PIC X(12), RPT-CUSTOMER-ID must expand and all offsets after it shift by +4\",\n    \"The AFP output CUSTRPT.AFP is derived from this file\"\n  ]\n}\n",
+      "metadata": {
+        "dataset_name": "ZENITH.CUST.REPORT.FILE",
+        "lrecl": 133,
+        "copybook": "",
+        "program": "CUSTRPT.CBL",
+        "fields": [
+          {
+            "name": "RPT-LINE-TYPE",
+            "offset": 0,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "RPT-CUSTOMER-ID",
+            "offset": 1,
+            "length": 8,
+            "pic": "PIC X(8)"
+          },
+          {
+            "name": "RPT-FILLER-1",
+            "offset": 9,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "RPT-CUSTOMER-NAME",
+            "offset": 10,
+            "length": 30,
+            "pic": "PIC X(30)"
+          },
+          {
+            "name": "RPT-FILLER-2",
+            "offset": 40,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "RPT-STATUS",
+            "offset": 41,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "RPT-FILLER-3",
+            "offset": 42,
+            "length": 1,
+            "pic": "PIC X"
+          },
+          {
+            "name": "RPT-OPEN-DATE",
+            "offset": 43,
+            "length": 8,
+            "pic": "PIC X(8)"
+          },
+          {
+            "name": "RPT-FILLER",
+            "offset": 51,
+            "length": 82,
+            "pic": "PIC X(82)"
+          }
+        ]
+      }
+    },
+    "3525e4ac7c4334ce": {
+      "id": "3525e4ac7c4334ce",
+      "path": "hlasm/CUSTDSCT.ASM",
+      "type": "HLASM",
+      "raw_content": "***********************************************************************\n* CUSTDSCT.ASM — Customer Master Record DSECT\n* ZENITH BANK (fictional) — synthetic data only\n*\n* This DSECT mirrors the CUSTMAST copybook layout for use in batch\n* performance modules written in HLASM. CUSTID DS CL8 must stay\n* synchronized with CUSTMAST.CPY CUSTOMER-ID PIC X(8).\n*\n* Dependency: CUSTMAST → CUSTDSCT (layout mirror, not a COPY link)\n* Change scenario: when CUSTOMER-ID expands 8→12, CUSTID DS CL8\n*   must become DS CL12 and all downstream EQU offsets must shift.\n***********************************************************************\nCUSTMREC DSECT\n*\n* ---- Customer Identification ----------------------------------------\n*\nCUSTID   DS    CL8             Customer ID (mirrors CUSTOMER-ID PIC X(8))\nCUSTNAME DS    CL30            Customer name\nCUSTADR1 DS    CL30            Address line 1\nCUSTADR2 DS    CL20            Address line 2\nCUSTCITY DS    CL15            City\nCUSTST   DS    CL2             State code\nCUSTZIP  DS    CL10            ZIP/postal code\nCUSTSTUS DS    CL1             Status: A=Active, I=Inactive, S=Suspended\nCUSTDATE DS    CL8             Account open date (YYYYMMDD)\nCUSTFILL DS    CL36            Reserved / filler\n*\n* ---- Computed offsets (EQU) -----------------------------------------\n*\nCUSTLEN  EQU   *-CUSTMREC      Total DSECT length = 160 bytes\nCUSTIDLN EQU   8               Length of CUSTID field\nCUSTNMLN EQU   30              Length of CUSTNAME field\n*\n* Usage in batch module:\n*   USING CUSTMREC,R4           Map record buffer to DSECT\n*   L     R5,CUSTID(,R4)        Load 8-byte customer ID  (not valid LR use)\n*   MVC   CUSTID(CUSTIDLN,R4),INBUFF  Move CL8 from input buffer\n*\n         END\n",
+      "metadata": {
+        "sections": [
+          {
+            "name": "CUSTMREC",
+            "kind": "DSECT",
+            "fields": [
+              {
+                "label": "CUSTID",
+                "opcode": "DS",
+                "operand": "CL8             Customer ID (mirrors CUSTOMER-ID PIC X(8))",
+                "byte_size": 8,
+                "offset": 0
+              },
+              {
+                "label": "CUSTNAME",
+                "opcode": "DS",
+                "operand": "CL30            Customer name",
+                "byte_size": 30,
+                "offset": 8
+              },
+              {
+                "label": "CUSTADR1",
+                "opcode": "DS",
+                "operand": "CL30            Address line 1",
+                "byte_size": 30,
+                "offset": 38
+              },
+              {
+                "label": "CUSTADR2",
+                "opcode": "DS",
+                "operand": "CL20            Address line 2",
+                "byte_size": 20,
+                "offset": 68
+              },
+              {
+                "label": "CUSTCITY",
+                "opcode": "DS",
+                "operand": "CL15            City",
+                "byte_size": 15,
+                "offset": 88
+              },
+              {
+                "label": "CUSTST",
+                "opcode": "DS",
+                "operand": "CL2             State code",
+                "byte_size": 2,
+                "offset": 103
+              },
+              {
+                "label": "CUSTZIP",
+                "opcode": "DS",
+                "operand": "CL10            ZIP/postal code",
+                "byte_size": 10,
+                "offset": 105
+              },
+              {
+                "label": "CUSTSTUS",
+                "opcode": "DS",
+                "operand": "CL1             Status: A=Active, I=Inactive, S=Suspended",
+                "byte_size": 1,
+                "offset": 115
+              },
+              {
+                "label": "CUSTDATE",
+                "opcode": "DS",
+                "operand": "CL8             Account open date (YYYYMMDD)",
+                "byte_size": 8,
+                "offset": 116
+              },
+              {
+                "label": "CUSTFILL",
+                "opcode": "DS",
+                "operand": "CL36            Reserved / filler",
+                "byte_size": 36,
+                "offset": 124
+              },
+              {
+                "label": "CUSTLEN",
+                "opcode": "EQU",
+                "operand": "*-CUSTMREC      Total DSECT length = 160 bytes",
+                "byte_size": 0,
+                "offset": -1
+              },
+              {
+                "label": "CUSTIDLN",
+                "opcode": "EQU",
+                "operand": "8               Length of CUSTID field",
+                "byte_size": 0,
+                "offset": -1
+              },
+              {
+                "label": "CUSTNMLN",
+                "opcode": "EQU",
+                "operand": "30              Length of CUSTNAME field",
+                "byte_size": 0,
+                "offset": -1
+              }
+            ]
+          }
+        ],
+        "copy_references": [],
+        "equ_symbols": {}
+      }
+    },
+    "88fdc7136d0e515f": {
+      "id": "88fdc7136d0e515f",
+      "path": "jcl/CUSTLOAD.JCL",
+      "type": "JCL",
+      "raw_content": "//CUSTLOAD JOB (ZENITH),\n//         'CUST MASTER LOAD',\n//         CLASS=A,\n//         MSGCLASS=X,\n//         NOTIFY=&SYSUID\n//*\n//* CUSTLOAD.JCL — Load Customer Master File\n//* ZENITH BANK (fictional) — synthetic data only\n//*\n//* Loads CUST.MASTER.FILE from sequential input.\n//* LRECL=80 must match the record length in CUSTMAST.CPY.\n//* Change scenario: when CUSTOMER-ID expands 8→12, record length\n//*   may grow and LRECL must be updated to match.\n//*\n//STEP010  EXEC PGM=IDCAMS\n//SYSPRINT DD  SYSOUT=*\n//SYSIN    DD  *\n  DEFINE CLUSTER                                          -\n    (NAME(ZENITH.CUST.MASTER.FILE)                       -\n     CYLINDERS(1 1)                                      -\n     RECORDSIZE(80 80)                                   -\n     INDEXED                                             -\n     KEYS(8 0)                                           -\n     SHAREOPTIONS(2 3))\n/*\n//STEP020  EXEC PGM=CUSTPROG\n//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR\n//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,\n//             DISP=OLD\n//INFILE   DD  DSN=ZENITH.CUST.INPUT.SEQ,\n//             DISP=SHR,\n//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)\n//SYSOUT   DD  SYSOUT=*\n//SYSPRINT DD  SYSOUT=*\n",
+      "metadata": {
+        "job_name": "CUSTLOAD",
+        "steps": [
+          {
+            "name": "STEP010",
+            "pgm": "IDCAMS",
+            "dds": []
+          },
+          {
+            "name": "STEP020",
+            "pgm": "CUSTPROG",
+            "dds": [
+              {
+                "ddname": "STEPLIB",
+                "dsn": "ZENITH.LOADLIB",
+                "disp": "SHR",
+                "lrecl": 0
+              },
+              {
+                "ddname": "CUSTMAST",
+                "dsn": "ZENITH.CUST.MASTER.FILE",
+                "disp": "OLD",
+                "lrecl": 0
+              },
+              {
+                "ddname": "INFILE",
+                "dsn": "ZENITH.CUST.INPUT.SEQ",
+                "disp": "SHR",
+                "lrecl": 80
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "22c118bdeaf86148": {
+      "id": "22c118bdeaf86148",
+      "path": "jcl/CUSTRPT.JCL",
+      "type": "JCL",
+      "raw_content": "//CUSTRPT  JOB (ZENITH),\n//         'CUST REPORT',\n//         CLASS=A,\n//         MSGCLASS=X,\n//         NOTIFY=&SYSUID\n//*\n//* CUSTRPT.JCL — Customer Report Job\n//* ZENITH BANK (fictional) — synthetic data only\n//*\n//* Runs CUSTRPT program.\n//* Reads CUST.MASTER.FILE, writes CUST.REPORT.FILE.\n//* Data lineage: CUST.MASTER.FILE → CUSTRPT.CBL → CUST.REPORT.FILE\n//*                                              → CUSTRPT.AFP (output)\n//*\n//STEP010  EXEC PGM=CUSTRPT\n//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR\n//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,\n//             DISP=SHR,\n//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)\n//CUSTRPT  DD  DSN=ZENITH.CUST.REPORT.FILE,\n//             DISP=(NEW,CATLG,DELETE),\n//             UNIT=SYSDA,\n//             SPACE=(CYL,(1,1)),\n//             DCB=(RECFM=FBA,LRECL=133,BLKSIZE=5320)\n//AFPOUT   DD  DSN=ZENITH.CUSTRPT.AFP,\n//             DISP=(NEW,CATLG,DELETE),\n//             UNIT=SYSDA,\n//             SPACE=(CYL,(1,1))\n//SYSOUT   DD  SYSOUT=*\n//SYSPRINT DD  SYSOUT=*\n",
+      "metadata": {
+        "job_name": "CUSTRPT",
+        "steps": [
+          {
+            "name": "STEP010",
+            "pgm": "CUSTRPT",
+            "dds": [
+              {
+                "ddname": "STEPLIB",
+                "dsn": "ZENITH.LOADLIB",
+                "disp": "SHR",
+                "lrecl": 0
+              },
+              {
+                "ddname": "CUSTMAST",
+                "dsn": "ZENITH.CUST.MASTER.FILE",
+                "disp": "SHR",
+                "lrecl": 80
+              },
+              {
+                "ddname": "CUSTRPT",
+                "dsn": "ZENITH.CUST.REPORT.FILE",
+                "disp": "NEW,CATLG,DELETE",
+                "lrecl": 133
+              },
+              {
+                "ddname": "AFPOUT",
+                "dsn": "ZENITH.CUSTRPT.AFP",
+                "disp": "NEW,CATLG,DELETE",
+                "lrecl": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "5cdc3e54e54cab95": {
+      "id": "5cdc3e54e54cab95",
+      "path": "jcl/NIGHTLY.JCL",
+      "type": "JCL",
+      "raw_content": "//NIGHTLY  JOB (ZENITH),\n//         'NIGHTLY BATCH',\n//         CLASS=B,\n//         MSGCLASS=X,\n//         NOTIFY=&SYSUID\n//*\n//* NIGHTLY.JCL — Nightly Batch Job\n//* ZENITH BANK (fictional) — synthetic data only\n//*\n//* Runs CUSTPROG, ACCTPROG, CUSTRPT in sequence.\n//* All three programs are in the blast radius of CUSTOMER-ID change.\n//* Step execution order matters: CUSTPROG before ACCTPROG.\n//*\n//STEP010  EXEC PGM=CUSTPROG\n//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR\n//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,\n//             DISP=SHR,\n//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)\n//SYSOUT   DD  SYSOUT=*\n//SYSPRINT DD  SYSOUT=*\n//*\n//STEP020  EXEC PGM=ACCTPROG,\n//             COND=(4,LT,STEP010)\n//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR\n//ACCTMAST DD  DSN=ZENITH.ACCT.MASTER.FILE,\n//             DISP=SHR,\n//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)\n//SYSOUT   DD  SYSOUT=*\n//SYSPRINT DD  SYSOUT=*\n//*\n//STEP030  EXEC PGM=CUSTRPT,\n//             COND=(4,LT,STEP020)\n//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR\n//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,\n//             DISP=SHR,\n//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)\n//CUSTRPT  DD  DSN=ZENITH.CUST.REPORT.FILE,\n//             DISP=(NEW,CATLG,DELETE),\n//             UNIT=SYSDA,\n//             SPACE=(CYL,(1,1)),\n//             DCB=(RECFM=FBA,LRECL=133,BLKSIZE=5320)\n//AFPOUT   DD  DSN=ZENITH.CUSTRPT.AFP,\n//             DISP=(NEW,CATLG,DELETE),\n//             UNIT=SYSDA,\n//             SPACE=(CYL,(1,1))\n//SYSOUT   DD  SYSOUT=*\n//SYSPRINT DD  SYSOUT=*\n",
+      "metadata": {
+        "job_name": "NIGHTLY",
+        "steps": [
+          {
+            "name": "STEP010",
+            "pgm": "CUSTPROG",
+            "dds": [
+              {
+                "ddname": "STEPLIB",
+                "dsn": "ZENITH.LOADLIB",
+                "disp": "SHR",
+                "lrecl": 0
+              },
+              {
+                "ddname": "CUSTMAST",
+                "dsn": "ZENITH.CUST.MASTER.FILE",
+                "disp": "SHR",
+                "lrecl": 80
+              }
+            ]
+          },
+          {
+            "name": "STEP020",
+            "pgm": "ACCTPROG",
+            "dds": [
+              {
+                "ddname": "STEPLIB",
+                "dsn": "ZENITH.LOADLIB",
+                "disp": "SHR",
+                "lrecl": 0
+              },
+              {
+                "ddname": "ACCTMAST",
+                "dsn": "ZENITH.ACCT.MASTER.FILE",
+                "disp": "SHR",
+                "lrecl": 80
+              }
+            ]
+          },
+          {
+            "name": "STEP030",
+            "pgm": "CUSTRPT",
+            "dds": [
+              {
+                "ddname": "STEPLIB",
+                "dsn": "ZENITH.LOADLIB",
+                "disp": "SHR",
+                "lrecl": 0
+              },
+              {
+                "ddname": "CUSTMAST",
+                "dsn": "ZENITH.CUST.MASTER.FILE",
+                "disp": "SHR",
+                "lrecl": 80
+              },
+              {
+                "ddname": "CUSTRPT",
+                "dsn": "ZENITH.CUST.REPORT.FILE",
+                "disp": "NEW,CATLG,DELETE",
+                "lrecl": 133
+              },
+              {
+                "ddname": "AFPOUT",
+                "dsn": "ZENITH.CUSTRPT.AFP",
+                "disp": "NEW,CATLG,DELETE",
+                "lrecl": 0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "edges": [
+    {
+      "source_id": "712753fa8ff1213d",
+      "target_id": "be52147dba43d85f",
+      "kind": "COPIES",
+      "location": {
+        "line": 39,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "712753fa8ff1213d",
+      "target_id": "15aadc7f3bb501d5",
+      "kind": "COPIES",
+      "location": {
+        "line": 42,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "86631093d5f48144",
+      "target_id": "819c79ed37e885b3",
+      "kind": "COPIES",
+      "location": {
+        "line": 30,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "86631093d5f48144",
+      "target_id": "15aadc7f3bb501d5",
+      "kind": "COPIES",
+      "location": {
+        "line": 33,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "48055e92b3d29a31",
+      "target_id": "819c79ed37e885b3",
+      "kind": "COPIES",
+      "location": {
+        "line": 35,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "48055e92b3d29a31",
+      "target_id": "15aadc7f3bb501d5",
+      "kind": "COPIES",
+      "location": {
+        "line": 43,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "be52147dba43d85f",
+      "target_id": "819c79ed37e885b3",
+      "kind": "COPIES",
+      "location": {
+        "line": 22,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "712753fa8ff1213d",
+      "target_id": "86631093d5f48144",
+      "kind": "CALLS",
+      "location": {
+        "line": 101,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "88fdc7136d0e515f",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "USES_DD",
+      "location": {
+        "line": 28,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "86631093d5f48144",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "READS_FROM",
+      "location": {
+        "line": 28,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "USES_DD",
+      "location": {
+        "line": 17,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "READS_FROM",
+      "location": {
+        "line": 17,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "310e5d6308a474c1",
+      "kind": "USES_DD",
+      "location": {
+        "line": 20,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "310e5d6308a474c1",
+      "kind": "WRITES_TO",
+      "location": {
+        "line": 20,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "5cdc3e54e54cab95",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "USES_DD",
+      "location": {
+        "line": 16,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "86631093d5f48144",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "READS_FROM",
+      "location": {
+        "line": 16,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "5cdc3e54e54cab95",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "USES_DD",
+      "location": {
+        "line": 34,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "7f1285a5accb3eb9",
+      "kind": "READS_FROM",
+      "location": {
+        "line": 34,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "5cdc3e54e54cab95",
+      "target_id": "310e5d6308a474c1",
+      "kind": "USES_DD",
+      "location": {
+        "line": 37,
+        "column": 0,
+        "end_line": null
+      }
+    },
+    {
+      "source_id": "22c118bdeaf86148",
+      "target_id": "310e5d6308a474c1",
+      "kind": "WRITES_TO",
+      "location": {
+        "line": 37,
+        "column": 0,
+        "end_line": null
+      }
+    }
+  ],
+  "lineage": [
+    {
+      "producer_id": "7f1285a5accb3eb9",
+      "consumer_id": "86631093d5f48144",
+      "dataset_name": "ZENITH.CUST.MASTER.FILE",
+      "dd_name": "CUSTMAST"
+    },
+    {
+      "producer_id": "7f1285a5accb3eb9",
+      "consumer_id": "22c118bdeaf86148",
+      "dataset_name": "ZENITH.CUST.MASTER.FILE",
+      "dd_name": "CUSTMAST"
+    },
+    {
+      "producer_id": "22c118bdeaf86148",
+      "consumer_id": "310e5d6308a474c1",
+      "dataset_name": "ZENITH.CUST.REPORT.FILE",
+      "dd_name": "CUSTRPT"
+    },
+    {
+      "producer_id": "7f1285a5accb3eb9",
+      "consumer_id": "86631093d5f48144",
+      "dataset_name": "ZENITH.CUST.MASTER.FILE",
+      "dd_name": "CUSTMAST"
+    },
+    {
+      "producer_id": "7f1285a5accb3eb9",
+      "consumer_id": "22c118bdeaf86148",
+      "dataset_name": "ZENITH.CUST.MASTER.FILE",
+      "dd_name": "CUSTMAST"
+    },
+    {
+      "producer_id": "22c118bdeaf86148",
+      "consumer_id": "310e5d6308a474c1",
+      "dataset_name": "ZENITH.CUST.REPORT.FILE",
+      "dd_name": "CUSTRPT"
+    }
+  ]
+}

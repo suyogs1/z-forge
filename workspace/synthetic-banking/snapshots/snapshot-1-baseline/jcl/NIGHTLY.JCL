@@ -1,0 +1,47 @@
+//NIGHTLY  JOB (ZENITH),
+//         'NIGHTLY BATCH',
+//         CLASS=B,
+//         MSGCLASS=X,
+//         NOTIFY=&SYSUID
+//*
+//* NIGHTLY.JCL — Nightly Batch Job
+//* ZENITH BANK (fictional) — synthetic data only
+//*
+//* Runs CUSTPROG, ACCTPROG, CUSTRPT in sequence.
+//* All three programs are in the blast radius of CUSTOMER-ID change.
+//* Step execution order matters: CUSTPROG before ACCTPROG.
+//*
+//STEP010  EXEC PGM=CUSTPROG
+//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR
+//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,
+//             DISP=SHR,
+//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//*
+//STEP020  EXEC PGM=ACCTPROG,
+//             COND=(4,LT,STEP010)
+//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR
+//ACCTMAST DD  DSN=ZENITH.ACCT.MASTER.FILE,
+//             DISP=SHR,
+//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
+//*
+//STEP030  EXEC PGM=CUSTRPT,
+//             COND=(4,LT,STEP020)
+//STEPLIB  DD  DSN=ZENITH.LOADLIB,DISP=SHR
+//CUSTMAST DD  DSN=ZENITH.CUST.MASTER.FILE,
+//             DISP=SHR,
+//             DCB=(RECFM=FB,LRECL=80,BLKSIZE=3200)
+//CUSTRPT  DD  DSN=ZENITH.CUST.REPORT.FILE,
+//             DISP=(NEW,CATLG,DELETE),
+//             UNIT=SYSDA,
+//             SPACE=(CYL,(1,1)),
+//             DCB=(RECFM=FBA,LRECL=133,BLKSIZE=5320)
+//AFPOUT   DD  DSN=ZENITH.CUSTRPT.AFP,
+//             DISP=(NEW,CATLG,DELETE),
+//             UNIT=SYSDA,
+//             SPACE=(CYL,(1,1))
+//SYSOUT   DD  SYSOUT=*
+//SYSPRINT DD  SYSOUT=*
