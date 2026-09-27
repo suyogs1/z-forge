@@ -130,8 +130,20 @@ export const App: React.FC = () => {
     return currentStep >= stepNumber
   }
 
+  const stageTitles: Record<number, string> = {
+    1: 'Change Request & Field Definition',
+    2: 'Blast Radius Topology (9 Artifacts Discovered)',
+    3: 'Topological Change Plan & Semantic Mutations',
+    4: 'Snapshot 2 Deterministic Validation (DATA_TRUNCATION Caught)',
+    5: 'Adversarial Critic Audit (Planted Variable Mismatch)',
+    6: 'Autonomous Working-Storage Remediation',
+    7: 'Final Certification & Verification (PASS & 0 Findings)',
+    8: 'Downstream AFP Print Stream Presentation',
+    9: 'Tamper-Evident SHA-256 Audit Trail & Cryptographic Seal',
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Enterprise Navigation Header */}
       <Header
         currentStep={currentStep}
@@ -155,53 +167,117 @@ export const App: React.FC = () => {
       />
 
       {/* Main Workspace Stage */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-        {/* State Banner / Breadcrumbs bar */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 backdrop-blur shadow-md">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
-            <div className="text-xs font-mono uppercase tracking-wider text-slate-400">
-              Workflow Stage:
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-7 sm:px-6 lg:px-8 space-y-6">
+        {/* Executive Platform Summary / Telemetry Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Blast Radius
+            </span>
+            <div className="font-mono text-lg font-bold text-white mt-1">
+              9 <span className="text-xs text-slate-400 font-normal">Artifacts</span>
             </div>
-            <div className="font-mono text-sm font-bold text-sky-300">
-              {currentStep === 1 && 'STATE 1 • Change Request Submitted'}
-              {currentStep === 2 && 'STATE 2 • Blast Radius Discovered (9 Artifacts)'}
-              {currentStep === 3 && 'STATE 3 • Topological Change Plan Generated'}
-              {currentStep === 4 && 'STATE 4 • Snapshot 2 Deterministic Validation FAIL'}
-              {currentStep === 5 && 'STATE 5 • Adversarial Critic CRITICAL Finding'}
-              {currentStep === 6 && 'STATE 6 • Autonomous Remediation Applied'}
-              {currentStep === 7 && 'STATE 7 • Final Snapshot 3 PASS & Certified'}
-              {currentStep === 8 && 'STATE 8 • Downstream AFP Print Definition Impact'}
-              {currentStep === 9 && 'STATE 9 • Tamper-Evident SHA-256 Audit Trail'}
-            </div>
+            <span className="text-[10px] text-slate-500 font-mono block mt-0.5">Topological Scope</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 mr-1">Display:</span>
-            <button
-              onClick={() => setViewMode('progressive')}
-              className={`text-xs px-3 py-1 rounded font-mono transition ${
-                viewMode === 'progressive'
-                  ? 'bg-sky-600 text-white font-semibold'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Story Mode (1→9)
-            </button>
-            <button
-              onClick={() => setViewMode('all')}
-              className={`text-xs px-3 py-1 rounded font-mono transition ${
-                viewMode === 'all'
-                  ? 'bg-sky-600 text-white font-semibold'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Full Board
-            </button>
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Dependencies
+            </span>
+            <div className="font-mono text-lg font-bold text-blue-300 mt-1">
+              20 <span className="text-xs text-slate-400 font-normal">Edges</span>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono block mt-0.5">Call & Copybook Graph</span>
+          </div>
+
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Data Lineage
+            </span>
+            <div className="font-mono text-lg font-bold text-indigo-300 mt-1">
+              6 <span className="text-xs text-slate-400 font-normal">Tiers</span>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono block mt-0.5">Schema → Storage → Print</span>
+          </div>
+
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Validation Pass 1
+            </span>
+            <div className="font-mono text-lg font-bold text-red-400 mt-1">
+              FAIL
+            </div>
+            <span className="text-[10px] text-red-400/80 font-mono block mt-0.5 truncate">
+              DATA_TRUNCATION
+            </span>
+          </div>
+
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Critic Finding
+            </span>
+            <div className="font-mono text-lg font-bold text-amber-300 mt-1">
+              1 <span className="text-xs text-slate-400 font-normal">Critical</span>
+            </div>
+            <span className="text-[10px] text-amber-400/80 font-mono block mt-0.5 truncate">
+              WS-ACCT-CUST-ID X(8)
+            </span>
+          </div>
+
+          <div className="bg-[#0b1222] border border-slate-800 rounded-lg p-3.5 shadow-sm">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block">
+              Certification
+            </span>
+            <div className="font-mono text-lg font-bold text-emerald-400 mt-1 flex items-center gap-1.5">
+              <span>PASS</span>
+              <span className="text-[11px] text-emerald-500 font-normal">✓</span>
+            </div>
+            <span className="text-[10px] text-emerald-400/80 font-mono block mt-0.5">
+              0 Inconsistencies
+            </span>
           </div>
         </div>
 
-        {/* 1. CHANGE REQUEST */}
+        {/* View Mode & Active Stage Bar */}
+        <div className="bg-[#0b1222] border border-slate-800 rounded-xl px-5 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold">
+              Current Stage:
+            </span>
+            <span className="font-mono text-sm font-semibold text-slate-200">
+              {stageTitles[currentStep] || 'Workflow Execution'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-mono mr-1">View Mode:</span>
+            <div className="flex items-center rounded-lg border border-slate-700/80 bg-slate-900 p-0.5">
+              <button
+                onClick={() => setViewMode('progressive')}
+                className={`text-xs px-3 py-1 rounded-md font-mono transition-colors ${
+                  viewMode === 'progressive'
+                    ? 'bg-blue-600 text-white font-medium shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Sequential
+              </button>
+              <button
+                onClick={() => setViewMode('all')}
+                className={`text-xs px-3 py-1 rounded-md font-mono transition-colors ${
+                  viewMode === 'all'
+                    ? 'bg-blue-600 text-white font-medium shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Full Overview
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 1. CHANGE REQUEST HERO */}
         {isVisible(1) && (
           <div ref={(el) => (sectionRefs.current[0] = el)} className="transition-all duration-300">
             <ChangeRequestCard
@@ -258,21 +334,21 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* 6. REMEDIATION DETAILS (Bridge to Step 7) */}
+        {/* 6. REMEDIATION DETAILS */}
         {isVisible(6) && currentStep === 6 && (
-          <div ref={(el) => (sectionRefs.current[5] = el)} className="bg-slate-900 border border-indigo-500/40 rounded-xl p-6 shadow-xl relative overflow-hidden transition-all duration-300">
+          <div ref={(el) => (sectionRefs.current[5] = el)} className="bg-[#0b1222] border border-blue-500/40 rounded-xl p-6 shadow-xl relative overflow-hidden transition-all duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-                  <span className="text-xs uppercase tracking-widest text-indigo-400 font-mono font-bold">
-                    Snapshot 3 Creation
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  <span className="text-[11px] uppercase tracking-wider text-blue-400 font-mono font-bold">
+                    SNAPSHOT 3 REMEDIATION
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-mono font-bold text-white">
                   Remediation Patch Applied to Working-Storage
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 max-w-2xl font-mono">
+                <p className="text-xs text-slate-300 mt-1 max-w-2xl font-mono">
                   `cobol/ACCTPROG.CBL`: WS-ACCT-CUST-ID resized PIC X(8) &rarr; PIC X(12). Clean snapshot branch created under `snapshots/snapshot-3`.
                 </p>
               </div>
@@ -281,10 +357,8 @@ export const App: React.FC = () => {
                 onClick={handleAdvanceToFinal}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-950/40 transition-all border border-emerald-400/30 active:scale-95"
               >
-                <span>[ RE-VALIDATE SNAPSHOT 3 ]</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                <span>RE-VALIDATE SNAPSHOT 3</span>
+                <span>&rarr;</span>
               </button>
             </div>
           </div>
@@ -327,10 +401,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* Enterprise Footer */}
-      <footer className="mt-16 border-t border-slate-800 bg-[#090d16] py-6 text-center text-xs text-slate-500 font-mono">
+      <footer className="mt-16 border-t border-slate-800/80 bg-[#05080f] py-6 text-center text-xs text-slate-500 font-mono">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            Z-FORGE &bull; IBM Bob 2.0 Hackathon &bull; AI Change Engineering Platform
+            Z-FORGE &bull; IBM Bob 2.0 Hackathon &bull; AI Change Engineering for IBM Z
           </div>
           <div className="text-slate-400">
             Deterministic Engine: Python 3.11+ &bull; Immutable Snapshots &bull; RFC-6962 SHA-256 Hashing

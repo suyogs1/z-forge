@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "zforge": {
-      "command": "${workspaceFolder}/packages/engine/.venv/Scripts/python.exe",
-      "args": ["${workspaceFolder}/packages/mcp/server.py"],
-      "env": {}
+      "url": "https://z-forge.vercel.app/api/mcp",
+      "disabled": false
     }
   }
 }

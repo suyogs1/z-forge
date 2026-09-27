@@ -22,57 +22,59 @@ export const ChangeRequestCard: React.FC<ChangeRequestCardProps> = ({
   const targetPic = req.target_type || req.target || `PIC X(${newLen})`
 
   return (
-    <div className="bg-[#0f172a] border border-slate-800 rounded-xl p-6 shadow-xl relative overflow-hidden">
-      {/* Accent corner line */}
-      <div className="absolute top-0 left-0 w-1.5 h-full bg-sky-500" />
+    <div className="bg-[#0b1222] border border-slate-800 rounded-xl p-7 shadow-2xl relative overflow-hidden">
+      {/* Subtle top indicator bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600" />
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-400 bg-sky-950/60 border border-sky-800/80 px-2 py-0.5 rounded">
-              Phase 1 &bull; Change Request
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-blue-400 bg-blue-950/60 border border-blue-800/60 px-2.5 py-0.5 rounded">
+              CHANGE SPECIFICATION
             </span>
-            <span className="text-xs text-slate-400">Target Field Expansion</span>
+            <span className="text-xs font-mono text-slate-400">Target: Core Banking Workspace</span>
           </div>
 
-          <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
-            <span className="font-mono bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-sky-300">
-              {fieldName}
-            </span>
-            <span className="text-slate-400 text-sm font-normal">
-              Mainframe Enterprise Customer Identifier
-            </span>
-          </h2>
+          <div>
+            <div className="text-xs uppercase font-mono tracking-wider text-slate-400">
+              Field Expansion
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-mono font-bold text-white tracking-tight flex items-center gap-3 mt-1">
+              <span className="text-sky-300 bg-slate-900/90 border border-slate-700/80 px-3 py-1 rounded">
+                {fieldName}
+              </span>
+            </h1>
+          </div>
 
-          <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Expand field capacity to accommodate standard 12-character regional bank identifiers across all core banking COBOL, copybook, HLASM assembler, JCL jobs, and print streams.
+          <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+            Expand field byte width across all shared copybooks, COBOL programs, HLASM dsects, JCL catalog datasets, and downstream AFP output streams to eliminate customer record truncation.
           </p>
         </div>
 
-        {/* Capacity Comparison Badge & CTA */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 bg-[#0a0f1d] border border-slate-800/90 p-4 rounded-xl">
-          <div className="flex items-center space-x-3 text-center sm:text-left">
+        {/* Hero Field Transformation Box & Action Button */}
+        <div className="flex flex-col sm:flex-row items-center gap-6 bg-[#070b14] border border-slate-800/90 p-5 rounded-xl shadow-inner">
+          <div className="flex items-center space-x-4 text-center sm:text-left">
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Current</div>
-              <div className="font-mono text-base font-bold text-slate-200">{currentPic}</div>
-              <div className="text-[11px] text-slate-500 font-mono">{oldLen} bytes</div>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Current Definition</div>
+              <div className="font-mono text-lg font-bold text-slate-200">{currentPic}</div>
+              <div className="text-[11px] text-slate-500 font-mono">{oldLen} Bytes</div>
             </div>
 
-            <div className="text-sky-400 font-bold text-xl px-1">&rarr;</div>
+            <div className="text-blue-400 font-mono font-bold text-2xl px-2">→</div>
 
             <div>
-              <div className="text-[11px] font-semibold text-sky-400 uppercase tracking-wider">Target</div>
-              <div className="font-mono text-base font-bold text-sky-300">{targetPic}</div>
-              <div className="text-[11px] text-sky-400/80 font-mono">{newLen} bytes</div>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-sky-400">Target Definition</div>
+              <div className="font-mono text-lg font-bold text-sky-300">{targetPic}</div>
+              <div className="text-[11px] text-sky-400/80 font-mono">{newLen} Bytes</div>
             </div>
           </div>
 
-          <div className="h-8 w-[1px] bg-slate-800 hidden sm:block" />
+          <div className="h-10 w-[1px] bg-slate-800 hidden sm:block" />
 
           <button
             onClick={onAnalyze}
             disabled={isLoading}
-            className="w-full sm:w-auto px-6 py-3 rounded-lg font-bold text-sm bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white shadow-lg shadow-sky-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto px-7 py-3.5 rounded-lg font-mono font-bold text-xs uppercase tracking-wider bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/30 transition-all border border-blue-400/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {isLoading ? (
               <>
@@ -83,7 +85,7 @@ export const ChangeRequestCard: React.FC<ChangeRequestCardProps> = ({
                 <span>Analyzing Workspace...</span>
               </>
             ) : isCompleted ? (
-              <span>Re-Analyze Change</span>
+              <span>RE-ANALYZE CHANGE</span>
             ) : (
               <span>ANALYZE CHANGE</span>
             )}
@@ -93,3 +95,4 @@ export const ChangeRequestCard: React.FC<ChangeRequestCardProps> = ({
     </div>
   )
 }
+
